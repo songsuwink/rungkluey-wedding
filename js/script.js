@@ -74,107 +74,46 @@ function initAnimations() {
 
 // Photo Gallery
 function initPhotoGallery() {
-  const gallery = document.getElementById('photoGallery');
-
-  // Sample photos (replace with your actual wedding photos)
-  const photos = [
-    {
-      src: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop',
-      alt: 'Engagement Photo 1',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop',
-      alt: 'Engagement Photo 2',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&h=300&fit=crop',
-      alt: 'Engagement Photo 3',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=400&h=300&fit=crop',
-      alt: 'Engagement Photo 4',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&h=300&fit=crop',
-      alt: 'Engagement Photo 5',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=400&h=300&fit=crop',
-      alt: 'Engagement Photo 6',
-    },
+  const images = [
+    ...Array.from({ length: 57 }, (_, i) => `images/gallery/img_${i + 1}.jpg`),
   ];
 
-  // Generate gallery HTML
-  photos.forEach((photo, index) => {
-    const colDiv = document.createElement('div');
-    colDiv.className = 'col-md-4 col-sm-6 mb-4';
+  const swiperWrapper = document.querySelector(
+    '#gallerySlider .swiper-wrapper'
+  );
+  if (!swiperWrapper) return;
 
-    colDiv.innerHTML = `
-            <div class="gallery-item fade-in" onclick="openLightbox(${index})">
-                <img src="${photo.src}" alt="${photo.alt}" class="img-fluid">
-                <div class="gallery-overlay">
-                    <i class="fas fa-search-plus"></i>
-                </div>
-            </div>
-        `;
+  // Inject slides
+  swiperWrapper.innerHTML = images
+    .map(
+      (src) => `
+      <div class="swiper-slide">
+        <img src="${src}" class="img-fluid rounded shadow" alt="Gallery Image" style="width:100%;max-height:500px;object-fit:contain; background:#f8f9fa; display:block; margin:auto;">
+      </div>
+    `
+    )
+    .join('');
 
-    gallery.appendChild(colDiv);
+  // Initialize Swiper
+  new Swiper('#gallerySlider', {
+    loop: true,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true,
+    },
+    slidesPerView: 1,
+    spaceBetween: 20,
+    centeredSlides: true,
+    grabCursor: true,
   });
-
-  // Create lightbox modal
-  const lightboxHTML = `
-        <div class="modal fade" id="lightboxModal" tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header border-0">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-center p-0">
-                        <img id="lightboxImage" src="" alt="" class="img-fluid">
-                        <div class="lightbox-controls mt-3 p-3">
-                            <button class="btn btn-outline-primary me-2" onclick="previousImage()">
-                                <i class="fas fa-chevron-left"></i> Previous
-                            </button>
-                            <button class="btn btn-outline-primary" onclick="nextImage()">
-                                Next <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-  document.body.insertAdjacentHTML('beforeend', lightboxHTML);
-
-  // Lightbox functionality
-  window.currentImageIndex = 0;
-  window.galleryPhotos = photos;
-
-  window.openLightbox = function (index) {
-    window.currentImageIndex = index;
-    document.getElementById('lightboxImage').src = photos[index].src;
-    document.getElementById('lightboxImage').alt = photos[index].alt;
-    const modal = new bootstrap.Modal(document.getElementById('lightboxModal'));
-    modal.show();
-  };
-
-  window.previousImage = function () {
-    window.currentImageIndex =
-      (window.currentImageIndex - 1 + photos.length) % photos.length;
-    document.getElementById('lightboxImage').src =
-      photos[window.currentImageIndex].src;
-    document.getElementById('lightboxImage').alt =
-      photos[window.currentImageIndex].alt;
-  };
-
-  window.nextImage = function () {
-    window.currentImageIndex = (window.currentImageIndex + 1) % photos.length;
-    document.getElementById('lightboxImage').src =
-      photos[window.currentImageIndex].src;
-    document.getElementById('lightboxImage').alt =
-      photos[window.currentImageIndex].alt;
-  };
 }
 
 // RSVP Form
@@ -309,7 +248,7 @@ function createFloatingHearts() {
   heart.style.left = Math.random() * 100 + 'vw';
   heart.style.top = '100vh';
   heart.style.fontSize = Math.random() * 20 + 15 + 'px';
-  heart.style.color = '#800020';
+  heart.style.color = '#4f6f52';
   heart.style.pointerEvents = 'none';
   heart.style.zIndex = '1000';
   heart.style.opacity = '0.7';
@@ -328,4 +267,4 @@ function createFloatingHearts() {
 }
 
 // Start floating hearts animation every 3 seconds
-// setInterval(createFloatingHearts, 3000);
+setInterval(createFloatingHearts, 3000);
