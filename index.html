@@ -253,6 +253,18 @@
           </div>
         </div>
       </div>
+      <div class="text-center mt-5">
+        <div class="row justify-content-center">
+          <div class="col-md-4">
+            <p class="th-lang text-muted">
+              ขอบคุณจากใจจริง ที่ร่วมเป็นส่วนหนึ่งในความรักของเรา
+              การมีคุณอยู่ในช่วงชีวิตนี้ทำให้วันสำคัญของเราสมบูรณ์แบบ
+              ไม่ว่าคุณจะมาได้หรือไม่ เราก็รับรู้ถึงความปรารถนาดีที่ส่งมาให้เสมอ
+              แล้วพบกันนะคะ/ครับ
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- RSVP Section -->
@@ -262,13 +274,15 @@
           <div class="col-md-8 col-lg-6">
             <div class="rsvp-card fade-in">
               <h2 class="section-title text-center mb-4">RSVP</h2>
-              <p class="text-center mb-4">
-                Please let us know if you'll be joining us on our special day
+              <p class="text-center th-lang mb-4">
+                โปรดแจ้งให้เราทราบว่าคุณจะมาร่วมงานพิเศษของเราหรือไม่
               </p>
 
               <form id="rsvpForm">
                 <div class="mb-3">
-                  <label for="guestName" class="form-label">Full Name</label>
+                  <label for="guestName" class="form-label th-lang"
+                    >ชื่อ-นามสกุล</label
+                  >
                   <input
                     type="text"
                     class="form-control"
@@ -278,7 +292,9 @@
                 </div>
 
                 <div class="mb-3">
-                  <label class="form-label">Will you be attending?</label>
+                  <label class="form-label th-lang"
+                    >คุณจะมาร่วมงานหรือไม่?</label
+                  >
                   <div class="form-check">
                     <input
                       class="form-check-input"
@@ -288,8 +304,8 @@
                       value="yes"
                       required
                     />
-                    <label class="form-check-label" for="attendingYes">
-                      Yes, I'll be there!
+                    <label class="form-check-label th-lang" for="attendingYes">
+                      ใช่, ฉันจะไปร่วมงาน!
                     </label>
                   </div>
                   <div class="form-check">
@@ -301,34 +317,37 @@
                       value="no"
                       required
                     />
-                    <label class="form-check-label" for="attendingNo">
-                      Sorry, I can't make it
+                    <label class="form-check-label th-lang" for="attendingNo">
+                      ขออภัย, ฉันไม่สามารถไปได้
                     </label>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="message" class="form-label"
-                    >Message for the Couple (Optional)</label
+                  <label for="message" class="form-label th-lang"
+                    >ข้อความสำหรับคู่บ่าวสาว (ไม่บังคับ)</label
                   >
                   <textarea
-                    class="form-control"
+                    class="form-control th-lang"
                     id="message"
                     rows="4"
-                    placeholder="Share your wishes or let us know about any dietary restrictions..."
+                    placeholder="แบ่งปันคำอวยพรของคุณ..."
                   ></textarea>
                 </div>
 
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary btn-lg">
-                    Send RSVP
+                  <button type="submit" class="btn btn-primary btn-lg th-lang">
+                    ส่งแบบตอบรับ
                   </button>
                 </div>
               </form>
 
-              <div id="rsvpSuccess" class="alert alert-success mt-3 d-none">
+              <div
+                id="rsvpSuccess"
+                class="alert alert-success mt-3 d-none th-lang"
+              >
                 <i class="fas fa-check-circle me-2"></i>
-                Thank you for your RSVP! We can't wait to celebrate with you.
+                ขอบคุณที่ตอบรับคำเชิญ! พวกเราตั้งตารอที่จะได้ฉลองกับคุณ
               </div>
             </div>
           </div>

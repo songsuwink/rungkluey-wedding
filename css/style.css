@@ -387,8 +387,8 @@ h6 {
 }
 
 .form-check-input:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background-color: var(--dark-green);
+  border-color: var(--dark-green);
 }
 
 .btn-primary {
@@ -660,7 +660,7 @@ h6 {
 .schedule-timeline {
   color: var(--text-dark);
   border-left: 3px solid #e6b980;
-  margin-left: 20px;
+  /* margin-left: 20px; */
   padding-left: 20px;
   position: relative;
   text-align: left;
@@ -742,15 +742,20 @@ h6 {
   box-shadow: 0 8px 24px rgba(26, 77, 46, 0.15);
 }
 
-/* Change Swiper navigation arrows to gray */
+/* Swiper navigation arrows: gray color & smaller size */
 .swiper-button-next,
 .swiper-button-prev {
-  color: #888 !important; /* For font-based icons */
-  fill: #888 !important; /* For SVG arrows */
+  color: #888 !important; /* Font-based icons */
+  fill: #888 !important; /* SVG arrows */
   opacity: 1;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .swiper-button-next::after,
 .swiper-button-prev::after {
-  color: #888 !important; /* For default Swiper arrows */
+  color: #888 !important; /* Default Swiper arrows */
+  font-size: 18px;
 }

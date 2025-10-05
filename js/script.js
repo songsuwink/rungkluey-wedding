@@ -87,8 +87,8 @@ function initPhotoGallery() {
   swiperWrapper.innerHTML = images
     .map(
       (src) => `
-      <div class="swiper-slide">
-        <img src="${src}" class="img-fluid rounded shadow" alt="Gallery Image" style="width:100%;max-height:500px;object-fit:contain; background:#f8f9fa; display:block; margin:auto;">
+      <div class="swiper-slide" style="display:flex;align-items:center;justify-content:center;min-height:300px;">
+        <img src="${src}" class="img-fluid rounded shadow" alt="Gallery Image" style="max-width:100%;max-height:500px;object-fit:contain; background:#f8f9fa; display:block;">
       </div>
     `
     )
@@ -105,14 +105,22 @@ function initPhotoGallery() {
       nextEl: '.swiper-button-next',
       prevEl: '.swiper-button-prev',
     },
-    pagination: {
-      el: '.swiper-pagination',
-      clickable: true,
-    },
     slidesPerView: 1,
     spaceBetween: 20,
     centeredSlides: true,
     grabCursor: true,
+    breakpoints: {
+      // Mobile and small tablets
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 10,
+      },
+      // Desktop and larger tablets
+      768: {
+        slidesPerView: 3,
+        spaceBetween: 30,
+      },
+    },
   });
 }
 
