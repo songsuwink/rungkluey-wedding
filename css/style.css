@@ -129,6 +129,10 @@ h6 {
   opacity: 0.3;
 }
 
+.hero-image {
+  background: var(--light-cream);
+}
+
 .hero-image img {
   transition: transform 0.5s ease;
 }
@@ -605,53 +609,71 @@ h6 {
   }
 }
 
+/* Crop Box Styles */
 .crop-box {
   width: 100%;
-  height: 750px;
+  height: 750px; /* Desktop */
   overflow: hidden;
+  position: relative;
+  display: inline-block;
 }
 
 .crop-box img {
   width: 100%;
   height: auto;
-  transform: translate(0px, -15px); /* shift what's visible */
+  transform: translate(0, -15px);
 }
 
-.crop-box {
-  position: relative;
-  display: inline-block;
-}
-
+/* Logo Overlay */
 .logo-overlay {
   position: absolute;
   left: 40%;
-  top: -5%; /* Move near the top */
+  top: -5%;
   transform: translateX(-50%);
-  max-width: 20%; /* Adjust as needed */
+  max-width: 20%;
   pointer-events: none;
 }
 
-/* Mobile responsiveness for crop-box */
-@media (max-width: 768px) {
+/* iPad/Tablet */
+@media (max-width: 1024px) {
   .crop-box {
-    height: 400px; /* Reduce height for tablets */
+    height: 500px;
   }
-
-  .crop-box img {
-    transform: translate(0px, -30px); /* Adjust crop position */
+  .logo-overlay {
+    max-width: 28%;
+    left: 35%;
+    top: 0;
   }
 }
 
+/* Mobile (large phones & below) */
+@media (max-width: 768px) {
+  .crop-box {
+    height: 400px;
+  }
+  .crop-box img {
+    transform: translate(0, -30px);
+  }
+  .logo-overlay {
+    max-width: 35%;
+    left: 50%;
+    top: 10px;
+  }
+}
+
+/* Mobile (small phones) */
 @media (max-width: 576px) {
   .crop-box {
-    height: 350px; /* Further reduce height for mobile */
+    height: 350px;
   }
-
   .crop-box img {
-    width: 100%;
-    height: auto;
-    transform: scale(1.5); /* zoom in 1.5x */
-    transform-origin: top; /* zoom from top */
+    transform: scale(1.5);
+    transform-origin: top;
+  }
+  .logo-overlay {
+    max-width: 30%;
+    left: 35%;
+    top: -10px;
   }
 }
 
