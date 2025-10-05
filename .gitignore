@@ -1,0 +1,15 @@
+# Ignore environment config
+env.js
+js/env.js
+
+# Node modules (if you use Node.js)
+node_modules/
+
+# Mac system files
+.DS_Store
+
+# Log files
+*.log
+
+# VS Code settings
+.vscode/

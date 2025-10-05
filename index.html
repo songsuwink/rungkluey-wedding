@@ -49,8 +49,13 @@
     <!-- Hero Section -->
     <section id="cover">
       <div class="hero-image text-center">
-        <div class="crop-box">
+        <div class="crop-box position-relative">
           <img src="images/prewedding/TEH09304.JPEG" alt="Bride and Groom" />
+          <img
+            src="/images/prewedding/logo-wedding.png"
+            alt="logo"
+            class="logo-overlay"
+          />
         </div>
       </div>
     </section>
@@ -305,7 +310,7 @@
                       required
                     />
                     <label class="form-check-label th-lang" for="attendingYes">
-                      ใช่, ฉันจะไปร่วมงาน!
+                      ใช่, ฉันจะไปร่วมงาน
                     </label>
                   </div>
                   <div class="form-check">
@@ -336,7 +341,17 @@
                 </div>
 
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary btn-lg th-lang">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg th-lang"
+                    id="rsvpSubmitBtn"
+                  >
+                    <span
+                      class="spinner-border spinner-border-sm me-2 d-none"
+                      role="status"
+                      aria-hidden="true"
+                      id="rsvpSpinner"
+                    ></span>
                     ส่งแบบตอบรับ
                   </button>
                 </div>

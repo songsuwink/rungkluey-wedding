@@ -617,6 +617,20 @@ h6 {
   transform: translate(0px, -15px); /* shift what's visible */
 }
 
+.crop-box {
+  position: relative;
+  display: inline-block;
+}
+
+.logo-overlay {
+  position: absolute;
+  left: 40%;
+  top: -5%; /* Move near the top */
+  transform: translateX(-50%);
+  max-width: 20%; /* Adjust as needed */
+  pointer-events: none;
+}
+
 /* Mobile responsiveness for crop-box */
 @media (max-width: 768px) {
   .crop-box {
@@ -695,8 +709,8 @@ h6 {
 }
 
 .dress-color {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: inline-block;
   border: 2px solid #fff;

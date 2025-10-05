@@ -105,7 +105,8 @@ function initPhotoGallery() {
       nextEl: '.swiper-button-next',
       prevEl: '.swiper-button-prev',
     },
-    slidesPerView: 1,
+    slidesPerView: 3,
+    slidesPerGroup: 3,
     spaceBetween: 20,
     centeredSlides: true,
     grabCursor: true,
@@ -128,11 +129,18 @@ function initPhotoGallery() {
 function initRSVPForm() {
   const form = document.getElementById('rsvpForm');
   const successAlert = document.getElementById('rsvpSuccess');
+  const submitBtn = document.getElementById('rsvpSubmitBtn');
+  const spinner = document.getElementById('rsvpSpinner');
+  const GOOGLE_SCRIPT_URL =
+    'https://script.google.com/macros/s/AKfycbxkLcqBsao_lZXFfbUTPnKVHq51X_6kmbwb8eASORP7YbcDXiobKbpIrIR28FypD59T/exec';
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    // Get form data
+    // Show spinner and disable button
+    spinner.classList.remove('d-none');
+    submitBtn.disabled = true;
+
     const formData = {
       name: document.getElementById('guestName').value,
       attendance: document.querySelector('input[name="attendance"]:checked')
@@ -141,27 +149,36 @@ function initRSVPForm() {
       timestamp: new Date().toISOString(),
     };
 
-    // Store in localStorage (in a real app, you'd send to a server)
-    let rsvpList = JSON.parse(localStorage.getItem('weddingRSVPs')) || [];
-    rsvpList.push(formData);
-    localStorage.setItem('weddingRSVPs', JSON.stringify(rsvpList));
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((res) => {
+        console.log('RSVP submitted sccessfully:', res);
+        spinner.classList.add('d-none');
+        submitBtn.disabled = false;
+        successAlert.classList.remove('d-none');
+        form.style.display = 'none';
+        successAlert.scrollIntoView({ behavior: 'smooth' });
 
-    // Show success message
-    successAlert.classList.remove('d-none');
-    form.style.display = 'none';
+        setTimeout(() => {
+          form.reset();
+          form.style.display = 'block';
+          successAlert.classList.add('d-none');
+        }, 10000);
 
-    // Scroll to success message
-    successAlert.scrollIntoView({ behavior: 'smooth' });
-
-    // Optional: Reset form after delay
-    setTimeout(() => {
-      form.reset();
-      form.style.display = 'block';
-      successAlert.classList.add('d-none');
-    }, 10000);
-
-    // Add confetti effect
-    createConfetti();
+        createConfetti();
+      })
+      .catch((error) => {
+        spinner.classList.add('d-none');
+        submitBtn.disabled = false;
+        alert('There was an error submitting your RSVP. Please try again.');
+        console.error(error);
+      });
   });
 }
 
