@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', function () {
   initPhotoGallery();
   initRSVPForm();
   initSmoothScrolling();
+
+  const addToCalendarBtn = document.getElementById('addToCalendarBtn');
+
+  if (addToCalendarBtn) {
+    addToCalendarBtn.addEventListener('click', function () {
+      addToCalendar();
+    });
+  }
 });
 
 // Countdown Timer
@@ -83,6 +91,24 @@ function initPhotoGallery() {
   );
   if (!swiperWrapper) return;
 
+  // Function to check if image is landscape
+  function isLandscape(img) {
+    return img.naturalWidth > img.naturalHeight;
+  }
+
+  // Function to determine slides per view based on image orientation
+  function getSlidesPerView() {
+    const firstImg = new Image();
+    return new Promise((resolve) => {
+      firstImg.onload = () => {
+        const landscape = isLandscape(firstImg);
+        resolve(landscape ? 1 : 3);
+      };
+      firstImg.onerror = () => resolve(3); // Default to 3 if image fails to load
+      firstImg.src = images[0];
+    });
+  }
+
   // Inject slides
   swiperWrapper.innerHTML = images
     .map(
@@ -94,34 +120,36 @@ function initPhotoGallery() {
     )
     .join('');
 
-  // Initialize Swiper
-  new Swiper('#gallerySlider', {
-    loop: true,
-    autoplay: {
-      delay: 3000,
-      disableOnInteraction: false,
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-    slidesPerView: 3,
-    slidesPerGroup: 3,
-    spaceBetween: 20,
-    centeredSlides: true,
-    grabCursor: true,
-    breakpoints: {
-      // Mobile and small tablets
-      320: {
-        slidesPerView: 1,
-        spaceBetween: 10,
+  // Initialize Swiper after determining image orientation
+  getSlidesPerView().then((slidesPerView) => {
+    new Swiper('#gallerySlider', {
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
       },
-      // Desktop and larger tablets
-      768: {
-        slidesPerView: 3,
-        spaceBetween: 30,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
       },
-    },
+      slidesPerView: slidesPerView,
+      slidesPerGroup: slidesPerView,
+      spaceBetween: 20,
+      centeredSlides: true,
+      grabCursor: true,
+      breakpoints: {
+        // Mobile and small tablets
+        320: {
+          slidesPerView: 1,
+          spaceBetween: 10,
+        },
+        // Desktop and larger tablets
+        768: {
+          slidesPerView: slidesPerView,
+          spaceBetween: 30,
+        },
+      },
+    });
   });
 }
 
@@ -293,3 +321,109 @@ function createFloatingHearts() {
 
 // Start floating hearts animation every 3 seconds
 setInterval(createFloatingHearts, 3000);
+
+function addToCalendar() {
+  // Wedding event details
+  const eventDetails = {
+    title: 'Piyaphat & Songsuwin Wedding',
+    description: 'พิธีหมั้น พิธีรับไหว้ และงานฉลองมงคลสมรส #RungKlueyWedding',
+    location:
+      'สวนเจริญทรัพย์ระยอง, 3161, Tambon Wang Wa, Amphoe Klaeng, Changwat Rayong, Thailand',
+    startDate: '2026-01-31',
+    startTime: '16:09',
+    endTime: '21:00',
+  };
+
+  // Create start and end datetime
+  const startDateTime = new Date(
+    `${eventDetails.startDate}T${eventDetails.startTime}:00+07:00`
+  );
+  const endDateTime = new Date(
+    `${eventDetails.startDate}T${eventDetails.endTime}:00+07:00`
+  );
+
+  // Format dates for different calendar systems
+  const formatDate = (date) => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+  // Check if user is on mobile device
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+  if (isMobile) {
+    // For mobile devices, create ICS file
+    createICSFile(eventDetails, startDateTime, endDateTime);
+  } else {
+    // For desktop, show options
+    showCalendarOptions(eventDetails, startDateTime, endDateTime);
+  }
+}
+
+function createICSFile(eventDetails, startDateTime, endDateTime) {
+  const formatICSDate = (date) => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Wedding Invitation//Wedding Event//EN',
+    'BEGIN:VEVENT',
+    `DTSTART:${formatICSDate(startDateTime)}`,
+    `DTEND:${formatICSDate(endDateTime)}`,
+    `SUMMARY:${eventDetails.title}`,
+    `DESCRIPTION:${eventDetails.description}`,
+    `LOCATION:${eventDetails.location}`,
+    `UID:${Date.now()}@wedding-invitation.com`,
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  // Create blob and download
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'rungkluey-wedding.ics';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
+function showCalendarOptions(eventDetails, startDateTime, endDateTime) {
+  const formatDate = (date) => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+  // Google Calendar URL
+  const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    eventDetails.title
+  )}&dates=${formatDate(startDateTime)}/${formatDate(
+    endDateTime
+  )}&details=${encodeURIComponent(
+    eventDetails.description
+  )}&location=${encodeURIComponent(eventDetails.location)}`;
+
+  // Outlook Calendar URL
+  const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(
+    eventDetails.title
+  )}&startdt=${startDateTime.toISOString()}&enddt=${endDateTime.toISOString()}&body=${encodeURIComponent(
+    eventDetails.description
+  )}&location=${encodeURIComponent(eventDetails.location)}`;
+
+  // Create modal or simple selection
+  const calendarChoice = confirm(
+    'เลือกปฏิทินที่ต้องการเพิ่ม:\nกด OK สำหรับ Google Calendar\nกด Cancel สำหรับดาวน์โหลดไฟล์ .ics'
+  );
+
+  if (calendarChoice) {
+    window.open(googleCalendarUrl, '_blank');
+  } else {
+    createICSFile(eventDetails, startDateTime, endDateTime);
+  }
+}
