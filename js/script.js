@@ -114,7 +114,7 @@ function initPhotoGallery() {
     .map(
       (src) => `
       <div class="swiper-slide" style="display:flex;align-items:center;justify-content:center;min-height:300px;">
-        <img src="${src}" class="img-fluid rounded shadow" alt="Gallery Image" style="max-width:100%;max-height:500px;object-fit:contain; background:#f8f9fa; display:block;">
+        <img src="${src}" class="img-fluid rounded shadow" alt="Gallery Image" style="max-width:100%;max-height:500px;object-fit:contain;background:#f8f9fa;display:block;margin:0 auto;">
       </div>
     `
     )
