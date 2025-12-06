@@ -122,6 +122,8 @@ function initPhotoGallery() {
 
   // Initialize Swiper after determining image orientation
   getSlidesPerView().then((slidesPerView) => {
+    const isLandscapeGallery = slidesPerView === 1;
+
     new Swiper('#gallerySlider', {
       loop: true,
       autoplay: {
@@ -140,7 +142,7 @@ function initPhotoGallery() {
       breakpoints: {
         // Mobile and small tablets
         320: {
-          slidesPerView: 1,
+          slidesPerView: isLandscapeGallery ? 2 : 1,
           spaceBetween: 10,
         },
         // Desktop and larger tablets
