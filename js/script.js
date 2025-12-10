@@ -83,76 +83,486 @@ function initAnimations() {
 // Photo Gallery
 function initPhotoGallery() {
   const images = [
-    ...Array.from({ length: 57 }, (_, i) => `images/gallery/img_${i + 1}.jpg`),
+    ...Array.from({ length: 88 }, (_, i) => `images/gallery/img_${i + 1}.jpg`),
   ];
+
+  // Shuffle the images array randomly
+  const shuffledImages = [...images].sort(() => Math.random() - 0.5);
 
   const swiperWrapper = document.querySelector(
     '#gallerySlider .swiper-wrapper'
   );
   if (!swiperWrapper) return;
 
-  // Function to check if image is landscape
-  function isLandscape(img) {
-    return img.naturalWidth > img.naturalHeight;
-  }
-
-  // Function to determine slides per view based on image orientation
-  function getSlidesPerView() {
-    const firstImg = new Image();
-    return new Promise((resolve) => {
-      firstImg.onload = () => {
-        const landscape = isLandscape(firstImg);
-        resolve(landscape ? 1 : 3);
-      };
-      firstImg.onerror = () => resolve(3); // Default to 3 if image fails to load
-      firstImg.src = images[0];
-    });
-  }
-
-  // Inject slides
-  swiperWrapper.innerHTML = images
+  // Inject slides with click functionality using shuffled images
+  swiperWrapper.innerHTML = shuffledImages
     .map(
-      (src) => `
-      <div class="swiper-slide" style="display:flex;align-items:center;justify-content:center;min-height:300px;">
-        <img src="${src}" class="img-fluid rounded shadow" alt="Gallery Image" style="max-width:100%;max-height:500px;object-fit:contain;background:#f8f9fa;display:block;margin:0 auto;">
+      (src, index) => `
+      <div class="swiper-slide">
+        <img src="${src}" class="img-fluid rounded shadow gallery-image" 
+             alt="Gallery Image" 
+             style="width:100%;height:400px;object-fit:cover;cursor:pointer;" 
+             data-src="${src}" 
+             data-index="${images.indexOf(src)}">
       </div>
     `
     )
     .join('');
 
-  // Initialize Swiper after determining image orientation
-  getSlidesPerView().then((slidesPerView) => {
-    const isLandscapeGallery = slidesPerView === 1;
+  // Initialize basic Swiper
+  new Swiper('#gallerySlider', {
+    loop: true,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    slidesPerView: 1,
+    spaceBetween: 20,
+    centeredSlides: true,
+    grabCursor: true,
+    breakpoints: {
+      768: {
+        slidesPerView: 3,
+        spaceBetween: 10,
+      },
+    },
+  });
 
-    new Swiper('#gallerySlider', {
-      loop: true,
-      autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-      },
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-      slidesPerView: slidesPerView,
-      slidesPerGroup: slidesPerView,
-      spaceBetween: 20,
-      centeredSlides: true,
-      grabCursor: true,
-      breakpoints: {
-        // Mobile and small tablets
-        320: {
-          slidesPerView: isLandscapeGallery ? 2 : 1,
-          spaceBetween: 10,
-        },
-        // Desktop and larger tablets
-        768: {
-          slidesPerView: slidesPerView,
-          spaceBetween: 30,
-        },
-      },
+  // Add click event listeners to images
+  document.querySelectorAll('.gallery-image').forEach((img) => {
+    img.addEventListener('click', function (e) {
+      e.stopPropagation();
+      openLightbox(this.dataset.src, parseInt(this.dataset.index), images);
     });
   });
+}
+
+// Lightbox functionality
+function openLightbox(src, currentIndex, allImages) {
+  // Create lightbox overlay
+  const lightbox = document.createElement('div');
+  lightbox.className = 'lightbox-overlay';
+  lightbox.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    cursor: pointer;
+    overflow: hidden;
+  `;
+
+  // Create image container
+  const imageContainer = document.createElement('div');
+  imageContainer.style.cssText = `
+    position: relative;
+    max-width: 95%;
+    max-height: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `;
+
+  // Create image element
+  let img = document.createElement('img');
+  img.src = src;
+  img.style.cssText = `
+    border-radius: 8px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+  `;
+
+  // Responsive image sizing
+  function setResponsiveImageSize(imgElement) {
+    const aspectRatio = imgElement.naturalWidth / imgElement.naturalHeight;
+    const isMobile = window.innerWidth <= 768;
+    const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+
+    if (isMobile) {
+      // Mobile responsive settings
+      if (aspectRatio > 1.3) {
+        // Wide image on mobile
+        imgElement.style.cssText += `
+          width: 100%;
+          max-width: 95vw;
+          max-height: 60vh;
+          object-fit: contain;
+        `;
+      } else if (aspectRatio < 0.8) {
+        // Tall image on mobile
+        imgElement.style.cssText += `
+          height: 80vh;
+          max-width: 90vw;
+          object-fit: contain;
+        `;
+      } else {
+        // Square-ish image on mobile
+        imgElement.style.cssText += `
+          max-width: 90vw;
+          max-height: 70vh;
+          object-fit: contain;
+        `;
+      }
+    } else if (isTablet) {
+      // Tablet responsive settings
+      if (aspectRatio > 1.5) {
+        imgElement.style.cssText += `
+          width: 90%;
+          max-height: 75vh;
+          object-fit: contain;
+        `;
+      } else if (aspectRatio < 0.7) {
+        imgElement.style.cssText += `
+          height: 85vh;
+          max-width: 80%;
+          object-fit: contain;
+        `;
+      } else {
+        imgElement.style.cssText += `
+          max-width: 85%;
+          max-height: 80vh;
+          object-fit: contain;
+        `;
+      }
+    } else {
+      // Desktop settings (original)
+      if (aspectRatio > 1.5) {
+        imgElement.style.cssText += `
+          width: 95%;
+          max-height: 85vh;
+          object-fit: contain;
+        `;
+      } else if (aspectRatio < 0.7) {
+        imgElement.style.cssText += `
+          height: 95vh;
+          max-width: 85%;
+          object-fit: contain;
+        `;
+      } else {
+        imgElement.style.cssText += `
+          max-width: 90%;
+          max-height: 90vh;
+          object-fit: contain;
+        `;
+      }
+    }
+  }
+
+  img.onload = function () {
+    setResponsiveImageSize(this);
+  };
+
+  // Create close button with responsive positioning
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '×';
+  const isMobile = window.innerWidth <= 768;
+
+  closeBtn.style.cssText = `
+    position: absolute;
+    top: ${isMobile ? '10px' : '0px'};
+    right: ${isMobile ? '10px' : '-40px'};
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: ${isMobile ? '35px' : '40px'};
+    height: ${isMobile ? '35px' : '40px'};
+    font-size: ${isMobile ? '20px' : '24px'};
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    transition: all 0.2s ease;
+  `;
+
+  // Create navigation buttons with responsive positioning
+  const prevBtn = document.createElement('button');
+  prevBtn.innerHTML = '‹';
+  prevBtn.style.cssText = `
+    position: absolute;
+    left: ${isMobile ? '10px' : '-60px'};
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: ${isMobile ? '40px' : '50px'};
+    height: ${isMobile ? '40px' : '50px'};
+    font-size: ${isMobile ? '24px' : '30px'};
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    transition: all 0.2s ease;
+    opacity: 50%;
+  `;
+
+  const nextBtn = document.createElement('button');
+  nextBtn.innerHTML = '›';
+  nextBtn.style.cssText = `
+    position: absolute;
+    right: ${isMobile ? '10px' : '-60px'};
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: ${isMobile ? '40px' : '50px'};
+    height: ${isMobile ? '40px' : '50px'};
+    font-size: ${isMobile ? '24px' : '30px'};
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    transition: all 0.2s ease;
+    opacity: 50%;
+  `;
+
+  // Add image counter with responsive positioning
+  const counter = document.createElement('div');
+  counter.style.cssText = `
+    position: absolute;
+    bottom: ${isMobile ? '-20px' : '0px'};
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: ${isMobile ? '6px 12px' : '8px 16px'};
+    border-radius: 20px;
+    font-size: ${isMobile ? '12px' : '14px'};
+    color: #333;
+    z-index: 10001;
+    white-space: nowrap;
+  `;
+  counter.textContent = `${currentIndex + 1} / ${allImages.length}`;
+
+  // Assemble lightbox
+  imageContainer.appendChild(img);
+  imageContainer.appendChild(closeBtn);
+  imageContainer.appendChild(prevBtn);
+  imageContainer.appendChild(nextBtn);
+  imageContainer.appendChild(counter);
+  lightbox.appendChild(imageContainer);
+  document.body.appendChild(lightbox);
+
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+
+  // Event listeners
+  let currentImageIndex = currentIndex;
+
+  function updateImage() {
+    const newImg = document.createElement('img');
+    newImg.src = allImages[currentImageIndex];
+    newImg.style.cssText = img.style.cssText;
+
+    newImg.onload = function () {
+      setResponsiveImageSize(this);
+      imageContainer.replaceChild(newImg, img);
+      img = newImg;
+    };
+
+    counter.textContent = `${currentImageIndex + 1} / ${allImages.length}`;
+  }
+
+  // Close lightbox
+  function closeLightbox() {
+    if (document.body.contains(lightbox)) {
+      document.body.removeChild(lightbox);
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  // Navigation
+  prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentImageIndex =
+      (currentImageIndex - 1 + allImages.length) % allImages.length;
+    updateImage();
+  });
+
+  nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentImageIndex = (currentImageIndex + 1) % allImages.length;
+    updateImage();
+  });
+
+  // Close events
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeLightbox();
+  });
+  lightbox.addEventListener('click', closeLightbox);
+  imageContainer.addEventListener('click', (e) => e.stopPropagation());
+
+  // Keyboard navigation
+  function handleKeyboard(e) {
+    if (e.key === 'Escape') {
+      closeLightbox();
+    }
+    if (e.key === 'ArrowLeft') {
+      currentImageIndex =
+        (currentImageIndex - 1 + allImages.length) % allImages.length;
+      updateImage();
+    }
+    if (e.key === 'ArrowRight') {
+      currentImageIndex = (currentImageIndex + 1) % allImages.length;
+      updateImage();
+    }
+  }
+
+  document.addEventListener('keydown', handleKeyboard);
+
+  // Handle window resize
+  function handleResize() {
+    const newIsMobile = window.innerWidth <= 768;
+
+    // Update button positions and sizes
+    closeBtn.style.cssText =
+      closeBtn.style.cssText.replace(
+        /top: \d+px;|right: -?\d+px;|width: \d+px;|height: \d+px;|font-size: \d+px;/g,
+        ''
+      ) +
+      `
+      top: ${newIsMobile ? '10px' : '0px'};
+      right: ${newIsMobile ? '10px' : '-40px'};
+      width: ${newIsMobile ? '35px' : '40px'};
+      height: ${newIsMobile ? '35px' : '40px'};
+      font-size: ${newIsMobile ? '20px' : '24px'};
+    `;
+
+    prevBtn.style.cssText =
+      prevBtn.style.cssText.replace(
+        /left: -?\d+px;|width: \d+px;|height: \d+px;|font-size: \d+px;/g,
+        ''
+      ) +
+      `
+      left: ${newIsMobile ? '10px' : '-60px'};
+      width: ${newIsMobile ? '40px' : '50px'};
+      height: ${newIsMobile ? '40px' : '50px'};
+      font-size: ${newIsMobile ? '24px' : '30px'};
+    `;
+
+    nextBtn.style.cssText =
+      nextBtn.style.cssText.replace(
+        /right: -?\d+px;|width: \d+px;|height: \d+px;|font-size: \d+px;/g,
+        ''
+      ) +
+      `
+      right: ${newIsMobile ? '10px' : '-60px'};
+      width: ${newIsMobile ? '40px' : '50px'};
+      height: ${newIsMobile ? '40px' : '50px'};
+      font-size: ${newIsMobile ? '24px' : '30px'};
+    `;
+
+    counter.style.cssText =
+      counter.style.cssText.replace(
+        /bottom: -?\d+px;|padding: \d+px \d+px;|font-size: \d+px;/g,
+        ''
+      ) +
+      `
+      bottom: ${newIsMobile ? '10px' : '-40px'};
+      padding: ${newIsMobile ? '6px 12px' : '8px 16px'};
+      font-size: ${newIsMobile ? '12px' : '14px'};
+    `;
+
+    // Resize current image
+    if (img.complete) {
+      setResponsiveImageSize(img);
+    }
+  }
+
+  window.addEventListener('resize', handleResize);
+
+  // Store original close function to clean up event listeners
+  const originalCloseLightbox = closeLightbox;
+  closeLightbox = function () {
+    document.removeEventListener('keydown', handleKeyboard);
+    window.removeEventListener('resize', handleResize);
+    originalCloseLightbox();
+  };
+
+  // Update event handlers to use new close function
+  closeBtn.removeEventListener('click', originalCloseLightbox);
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeLightbox();
+  });
+  lightbox.removeEventListener('click', originalCloseLightbox);
+  lightbox.addEventListener('click', closeLightbox);
+
+  // Add hover effects for desktop
+  if (!isMobile) {
+    [closeBtn, prevBtn, nextBtn].forEach((btn) => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.transform =
+          btn === prevBtn || btn === nextBtn
+            ? 'translateY(-50%) scale(1.1)'
+            : 'scale(1.1)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform =
+          btn === prevBtn || btn === nextBtn
+            ? 'translateY(-50%) scale(1)'
+            : 'scale(1)';
+      });
+    });
+  }
+
+  // Add touch gestures for mobile
+  if (isMobile) {
+    let startX = 0;
+    let startY = 0;
+
+    imageContainer.addEventListener(
+      'touchstart',
+      (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      },
+      { passive: true }
+    );
+
+    imageContainer.addEventListener(
+      'touchend',
+      (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+
+        // Only trigger if horizontal swipe is more significant than vertical
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+          if (diffX > 0) {
+            // Swiped left - next image
+            currentImageIndex = (currentImageIndex + 1) % allImages.length;
+            updateImage();
+          } else {
+            // Swiped right - previous image
+            currentImageIndex =
+              (currentImageIndex - 1 + allImages.length) % allImages.length;
+            updateImage();
+          }
+        }
+      },
+      { passive: true }
+    );
+  }
 }
 
 // RSVP Form
@@ -429,3 +839,38 @@ function showCalendarOptions(eventDetails, startDateTime, endDateTime) {
     createICSFile(eventDetails, startDateTime, endDateTime);
   }
 }
+
+function showColorImage(colorName) {
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('colorModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'colorModal';
+    modal.className = 'color-modal';
+    modal.innerHTML = `
+      <span class="close-btn" onclick="closeColorModal()">&times;</span>
+      <img id="colorImage" src="" alt="Dress Color">
+    `;
+    document.body.appendChild(modal);
+  }
+
+  // Set image source and show modal
+  const img = document.getElementById('colorImage');
+  img.src = `images/dress_color/${colorName}.jpg`; // Adjust extension as needed
+  modal.style.display = 'flex';
+}
+
+function closeColorModal() {
+  const modal = document.getElementById('colorModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Close modal when clicking outside the image
+document.addEventListener('click', function (e) {
+  const modal = document.getElementById('colorModal');
+  if (modal && e.target === modal) {
+    closeColorModal();
+  }
+});
