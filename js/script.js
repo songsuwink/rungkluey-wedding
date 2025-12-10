@@ -856,6 +856,19 @@ function showColorImage(colorName) {
 
   // Set image source and show modal
   const img = document.getElementById('colorImage');
+
+  // Add error handling for missing images
+  img.onerror = function () {
+    console.error('Image not found:', this.src);
+    // Hide modal if image fails to load
+    modal.style.display = 'none';
+    alert('ขออภัย ไม่พบรูปภาพสีที่เลือก');
+  };
+
+  img.onload = function () {
+    console.log('Image loaded successfully:', this.src);
+  };
+
   img.src = `images/dress_color/${colorName}.jpg`;
   console.log('Showing color image:', img.src);
   modal.style.display = 'flex';
