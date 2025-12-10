@@ -83,7 +83,7 @@ function initAnimations() {
 // Photo Gallery
 function initPhotoGallery() {
   const images = [
-    ...Array.from({ length: 88 }, (_, i) => `images/gallery/img_${i + 1}.jpg`),
+    ...Array.from({ length: 88 }, (_, i) => `images/gallery/img_${i + 1}-min.jpg`),
   ];
 
   // Shuffle the images array randomly
