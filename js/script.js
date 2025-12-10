@@ -856,7 +856,7 @@ function showColorImage(colorName) {
 
   // Set image source and show modal
   const img = document.getElementById('colorImage');
-  img.src = `images/dress_color/${colorName}.jpg`; // Adjust extension as needed
+  img.src = `images/dress_color/${colorName}.jpg`;
   modal.style.display = 'flex';
 }
 
