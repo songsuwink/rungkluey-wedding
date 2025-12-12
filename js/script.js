@@ -28,8 +28,10 @@ function initCountdown() {
 
     if (distance < 0) {
       // Wedding day has passed
-      document.getElementById('countdownTimer').innerHTML =
-        "<h3>We're Married! 💕</h3>";
+      const timerEl = document.getElementById('countdownTimer');
+      if (timerEl) {
+        timerEl.innerHTML = "<h3>We're Married! 💕</h3>";
+      }
       return;
     }
 
@@ -40,18 +42,15 @@ function initCountdown() {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    document.getElementById('days').textContent = days
-      .toString()
-      .padStart(2, '0');
-    document.getElementById('hours').textContent = hours
-      .toString()
-      .padStart(2, '0');
-    document.getElementById('minutes').textContent = minutes
-      .toString()
-      .padStart(2, '0');
-    document.getElementById('seconds').textContent = seconds
-      .toString()
-      .padStart(2, '0');
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+    if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+    if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+    if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
   }
 
   // Update countdown immediately and then every second
@@ -103,7 +102,8 @@ function initPhotoGallery() {
              alt="Gallery Image" 
              style="width:100%;height:400px;object-fit:cover;cursor:pointer;" 
              data-src="${src}" 
-             data-index="${images.indexOf(src)}">
+             data-index="${images.indexOf(src)}"
+             onerror="this.style.display='none'">
       </div>
     `
     )
@@ -571,6 +571,12 @@ function initRSVPForm() {
   const successAlert = document.getElementById('rsvpSuccess');
   const submitBtn = document.getElementById('rsvpSubmitBtn');
   const spinner = document.getElementById('rsvpSpinner');
+
+  // Check if required elements exist
+  if (!form || !submitBtn) {
+    console.warn('RSVP form elements not found');
+    return;
+  }
   const GOOGLE_SCRIPT_URL =
     'https://script.google.com/macros/s/AKfycbxkLcqBsao_lZXFfbUTPnKVHq51X_6kmbwb8eASORP7YbcDXiobKbpIrIR28FypD59T/exec';
 
@@ -581,11 +587,24 @@ function initRSVPForm() {
     spinner.classList.remove('d-none');
     submitBtn.disabled = true;
 
+    // Validate form elements exist
+    const nameEl = document.getElementById('guestName');
+    const attendanceEl = document.querySelector(
+      'input[name="attendance"]:checked'
+    );
+    const messageEl = document.getElementById('message');
+
+    if (!nameEl || !attendanceEl) {
+      alert('Please fill out all required fields.');
+      if (spinner) spinner.classList.add('d-none');
+      submitBtn.disabled = false;
+      return;
+    }
+
     const formData = {
-      name: document.getElementById('guestName').value,
-      attendance: document.querySelector('input[name="attendance"]:checked')
-        .value,
-      message: document.getElementById('message').value,
+      name: nameEl.value,
+      attendance: attendanceEl.value,
+      message: messageEl ? messageEl.value : '',
       timestamp: new Date().toISOString(),
     };
 
@@ -598,26 +617,28 @@ function initRSVPForm() {
       body: JSON.stringify(formData),
     })
       .then((res) => {
-        console.log('RSVP submitted sccessfully:', res);
-        spinner.classList.add('d-none');
+        console.log('RSVP submitted successfully:', res);
+        if (spinner) spinner.classList.add('d-none');
         submitBtn.disabled = false;
-        successAlert.classList.remove('d-none');
+        if (successAlert) {
+          successAlert.classList.remove('d-none');
+          successAlert.scrollIntoView({ behavior: 'smooth' });
+        }
         form.style.display = 'none';
-        successAlert.scrollIntoView({ behavior: 'smooth' });
 
         setTimeout(() => {
           form.reset();
           form.style.display = 'block';
-          successAlert.classList.add('d-none');
+          if (successAlert) successAlert.classList.add('d-none');
         }, 10000);
 
         createConfetti();
       })
       .catch((error) => {
-        spinner.classList.add('d-none');
+        if (spinner) spinner.classList.add('d-none');
         submitBtn.disabled = false;
         alert('There was an error submitting your RSVP. Please try again.');
-        console.error(error);
+        console.error('RSVP submission error:', error);
       });
   });
 }
@@ -674,7 +695,13 @@ function createConfetti() {
 
       // Remove confetti after animation
       setTimeout(() => {
-        document.body.removeChild(confetti);
+        try {
+          if (document.body.contains(confetti)) {
+            document.body.removeChild(confetti);
+          }
+        } catch (error) {
+          console.warn('Error removing confetti:', error);
+        }
       }, 3050);
     }, i * 30);
   }
@@ -727,7 +754,13 @@ function createFloatingHearts() {
   }, 100);
 
   setTimeout(() => {
-    document.body.removeChild(heart);
+    try {
+      if (document.body.contains(heart)) {
+        document.body.removeChild(heart);
+      }
+    } catch (error) {
+      console.warn('Error removing floating heart:', error);
+    }
   }, 6100);
 }
 
