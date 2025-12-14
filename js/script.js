@@ -85,16 +85,13 @@ function initPhotoGallery() {
     ...Array.from({ length: 40 }, (_, i) => `images/gallery/img_${i + 1}.jpg`),
   ];
 
-  // Shuffle the images array randomly
-  const shuffledImages = [...images].sort(() => Math.random() - 0.5);
-
   const swiperWrapper = document.querySelector(
     '#gallerySlider .swiper-wrapper'
   );
   if (!swiperWrapper) return;
 
-  // Inject slides with click functionality using shuffled images
-  swiperWrapper.innerHTML = shuffledImages
+  // Inject slides with click functionality
+  swiperWrapper.innerHTML = images
     .map(
       (src, index) => `
       <div class="swiper-slide">
@@ -102,7 +99,7 @@ function initPhotoGallery() {
              alt="Gallery Image" 
              style="width:100%;height:400px;object-fit:cover;cursor:pointer;" 
              data-src="${src}" 
-             data-index="${images.indexOf(src)}"
+             data-index="${index}"
              onerror="this.style.display='none'">
       </div>
     `
