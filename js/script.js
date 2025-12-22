@@ -580,6 +580,20 @@ function initRSVPForm() {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
+    // Basic client-side rate limiting: 1 submission per 60 seconds
+    const lastSubmit = localStorage.getItem('rsvpLastSubmit');
+    const now = Date.now();
+    if (lastSubmit && now - parseInt(lastSubmit, 10) < 60000) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Please wait',
+        text: 'You can only submit the RSVP once per minute. Please wait and try again.',
+        confirmButtonColor: '#4f6f52',
+      });
+      return;
+    }
+    localStorage.setItem('rsvpLastSubmit', now);
+
     // Show spinner and disable button
     spinner.classList.remove('d-none');
     submitBtn.disabled = true;
@@ -614,7 +628,6 @@ function initRSVPForm() {
       body: JSON.stringify(formData),
     })
       .then((res) => {
-        console.log('RSVP submitted successfully:', res);
         if (spinner) spinner.classList.add('d-none');
         submitBtn.disabled = false;
         if (successAlert) {
